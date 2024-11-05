@@ -113,26 +113,24 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        overlap = self.crossword.overlaps.get((x, y))  # Use get to avoid KeyErrors
+        overlap = self.crossword.overlaps.get((x, y))  
         if overlap is None:
             return False
 
         revised = False
-        i, j = overlap  # Unpack the indices for readability
+        i, j = overlap 
 
-        for word1 in self.domains[x].copy():  # Use a copy to avoid modifying the list while iterating
+        for word1 in self.domains[x].copy():  
             compatible = False
             for word2 in self.domains[y]:
-                if self.crossword.is_compatible(word1, word2, x, y):  # Call the method on the crossword instance
+                if self.crossword.is_compatible(word1, word2, x, y): 
                     compatible = True
                     break
-        if not compatible:  # If no compatible word was found
+        if not compatible:  
             print(f"Removing {word1} from domain of {x}")
-            self.domains[x].remove(word1)  # Remove incompatible word
+            self.domains[x].remove(word1) 
             revised = True
-
-
-                
+      
         return revised
     
     def ac3(self, arcs=None):
@@ -177,7 +175,7 @@ class CrosswordCreator():
                     overlap = self.crossword.overlaps[var, neighbor]
                     if overlap and word[overlap[0]] != assignment[neighbor][overlap[1]]:
                         return False
-        return True  # Ensure this is outside the for loop
+        return True  
 
     def order_domain_values(self, var, assignment):
         """
@@ -185,20 +183,6 @@ class CrosswordCreator():
         the number of values they rule out for neighboring variables.
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
-        """
-        # def count_conflicts(value):
-        #     conflicts = 0
-        #     for neighbor in self.crossword.neighbors(var):  # Zamijenjeno sa self.crossword.neighbors(var)
-        #         if neighbor in assignment:
-        #             if not self.is_compatible(value, assignment[neighbor], var, neighbor):
-        #                 conflicts += 1
-        #     return conflicts
-
-        # return sorted(self.domains[var], key=lambda value: self.count_conflicts(var, value, assignment))
-    def order_domain_values(self, var, assignment):
-        """
-        Return a list of values in the domain of `var`, in order by
-        the number of values they rule out for neighboring variables.
         """
         return sorted(self.domains[var], key=lambda value: self.count_conflicts(var, value, assignment))
     
@@ -240,7 +224,6 @@ class CrosswordCreator():
 
         return None
     
-    # DODALA
     def count_conflicts(self, var, value, assignment):
         """
         Counts the number of conflicts for the given variable (var) and its potential value.
@@ -262,7 +245,6 @@ def main():
     words = sys.argv[2]
     output = sys.argv[3] if len(sys.argv) == 4 else None
 
-#dodala
     structure = f"data/{structure}"  # Adjust this line if your files are in a different folder
     words = f"data/{words}"
 

@@ -125,73 +125,41 @@ class Crossword():
                         cells2.index(intersection)
                     )
 
-        #DODALA METODE
     def load_words(self, words_file):
         """Load words from a given file and store them in the words set."""
         with open(words_file) as f:
             self.words = set(f.read().upper().splitlines())
 
-    def initialize_variables(self):
-        """Determine variable set."""
+    def find_word_variables(self, direction):
         for i in range(self.height):
             for j in range(self.width):
-                # Vertical words
-                starts_word = (
-                    self.structure[i][j]
-                    and (i == 0 or not self.structure[i - 1][j])
-                )
-                if starts_word:
-                    length = 1
-                    for k in range(i + 1, self.height):
-                        if self.structure[k][j]:
-                            length += 1
-                        else:
-                            break
-                    if length > 1:
-                        self.variables.add(Variable(
-                            i=i, j=j,
-                            direction=Variable.DOWN,
-                            length=length
-                        ))
+                if direction == Variable.DOWN:
+                    starts_word = (self.structure[i][j] and (i == 0 or not self.structure[i - 1][j]))
+                    if starts_word:
+                        length = 1
+                        for k in range(i + 1, self.height):
+                            if self.structure[k][j]:
+                                length += 1
+                            else:
+                                break
+                        if length > 1:
+                            self.variables.add(Variable(i=i, j=j, direction=Variable.DOWN, length=length))
+                elif direction == Variable.ACROSS:
+                    starts_word = (self.structure[i][j] and (j == 0 or not self.structure[i][j - 1]))
+                    if starts_word:
+                        length = 1
+                        for k in range(j + 1, self.width):
+                            if self.structure[i][k]:
+                                length += 1
+                            else:
+                                break
+                        if length > 1:
+                           self.variables.add(Variable(i=i, j=j, direction=Variable.ACROSS, length=length))
 
-                # Horizontal words
-                starts_word = (
-                    self.structure[i][j]
-                    and (j == 0 or not self.structure[i][j - 1])
-                )
-                if starts_word:
-                    length = 1
-                    for k in range(j + 1, self.width):
-                        if self.structure[i][k]:
-                            length += 1
-                        else:
-                            break
-                    if length > 1:
-                        self.variables.add(Variable(
-                            i=i, j=j,
-                            direction=Variable.ACROSS,
-                            length=length
-                        ))
-
-        # Compute overlaps for each word
-        self.overlaps = dict()
-        for v1 in self.variables:
-            for v2 in self.variables:
-                if v1 == v2:
-                    continue
-                cells1 = v1.cells
-                cells2 = v2.cells
-                intersection = set(cells1).intersection(cells2)
-                if not intersection:
-                    self.overlaps[v1, v2] = None
-                else:
-                    intersection = intersection.pop()
-                    self.overlaps[v1, v2] = (
-                        cells1.index(intersection),
-                        cells2.index(intersection)
-                    )
-            
-
+    def initialize_variables(self):
+        self.find_word_variables(Variable.DOWN)
+        self.find_word_variables(Variable.ACROSS)
+    
     def neighbors(self, var):
         """Given a variable, return set of overlapping variables."""
         return [
